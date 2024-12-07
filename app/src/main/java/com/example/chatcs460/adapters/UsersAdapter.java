@@ -15,30 +15,35 @@ import com.example.chatcs460.models.User;
 
 import java.util.List;
 
+/**
+ * Adapter class for displaying a list of users in a RecyclerView.
+ */
 public class UsersAdapter extends RecyclerView.Adapter<UsersAdapter.UserViewHolder> {
 
     private final List<User> users;
     private final UserListener userListener;
 
+    /**
+     * Constructor for initializing the adapter with a list of users and a user listener.
+     * @param users the list of users to display.
+     * @param userListener the listener for handling user item clicks.
+     */
     public UsersAdapter(List<User> users, UserListener userListener) {
         this.users = users;
         this.userListener = userListener;
     }
 
-
     @NonNull
     @Override
     public UserViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-
         ItemContainerUserBinding itemContainerUserBinding = ItemContainerUserBinding
-                .inflate(LayoutInflater.from(parent.getContext()),parent,false);
+                .inflate(LayoutInflater.from(parent.getContext()), parent, false);
         return new UserViewHolder(itemContainerUserBinding);
     }
 
     @Override
     public void onBindViewHolder(@NonNull UserViewHolder holder, int position) {
         holder.setUserData(users.get(position));
-
     }
 
     @Override
@@ -46,19 +51,26 @@ public class UsersAdapter extends RecyclerView.Adapter<UsersAdapter.UserViewHold
         return users.size();
     }
 
-
-
-
-    class UserViewHolder extends RecyclerView.ViewHolder{
+    /**
+     * ViewHolder class for binding user data to a single item view.
+     */
+    class UserViewHolder extends RecyclerView.ViewHolder {
         ItemContainerUserBinding binding;
 
-
+        /**
+         * Constructor for initializing the ViewHolder with the binding of a user item.
+         * @param itemContainerUserBinding the binding for the user item.
+         */
         public UserViewHolder(ItemContainerUserBinding itemContainerUserBinding) {
             super(itemContainerUserBinding.getRoot());
             binding = itemContainerUserBinding;
         }
 
-        void setUserData(User user){
+        /**
+         * Binds user data to the views.
+         * @param user the user data to display.
+         */
+        void setUserData(User user) {
             binding.textName.setText(user.name);
             binding.textEmail.setText(user.email);
             binding.imageProfile.setImageBitmap(getUserImage(user.image));
@@ -66,8 +78,14 @@ public class UsersAdapter extends RecyclerView.Adapter<UsersAdapter.UserViewHold
             binding.getRoot().setOnClickListener(view -> userListener.onUserClicked(user));
         }
     }
-    private Bitmap getUserImage(String encodedImage){
-        byte [] bytes = Base64.decode(encodedImage,Base64.DEFAULT);
-        return BitmapFactory.decodeByteArray(bytes,0,bytes.length);
+
+    /**
+     * Decodes a base64-encoded image string into a Bitmap.
+     * @param encodedImage the base64-encoded image string.
+     * @return the decoded Bitmap.
+     */
+    private Bitmap getUserImage(String encodedImage) {
+        byte[] bytes = Base64.decode(encodedImage, Base64.DEFAULT);
+        return BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
     }
 }

@@ -24,6 +24,9 @@ import com.google.firebase.firestore.QueryDocumentSnapshot;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Activity class for displaying a list of users and handling user interactions.
+ */
 public class userActivity extends AppCompatActivity implements UserListener {
 
     private ActivityUserBinding binding;
@@ -37,25 +40,29 @@ public class userActivity extends AppCompatActivity implements UserListener {
         setContentView(binding.getRoot());
         setListeners();
         getUsers();
-
     }
 
+    /**
+     * Sets up the UI listeners for user interactions.
+     */
     private void setListeners() {
-
         binding.imageBack.setOnClickListener(view -> onBackPressed());
     }
 
-    private void getUsers(){
+    /**
+     * Fetches users from Firestore and displays them in the RecyclerView.
+     */
+    private void getUsers() {
         loading(true);
         FirebaseFirestore database = FirebaseFirestore.getInstance();
         database.collection(Constants.KEY_COLLECTION_USERS).get()
                 .addOnCompleteListener(task -> {
                     loading(false);
                     String currentUserId = preferenceManager.getString(Constants.KEY_USER_ID);
-                    if(task.isSuccessful() && task.getResult()!=null){
+                    if (task.isSuccessful() && task.getResult() != null) {
                         List<User> users = new ArrayList<>();
-                        for (QueryDocumentSnapshot queryDocumentSnapshot : task.getResult()){
-                            if(currentUserId.equals(queryDocumentSnapshot.getId())){
+                        for (QueryDocumentSnapshot queryDocumentSnapshot : task.getResult()) {
+                            if (currentUserId.equals(queryDocumentSnapshot.getId())) {
                                 continue;
                             }
                             User user = new User();
@@ -66,28 +73,35 @@ public class userActivity extends AppCompatActivity implements UserListener {
                             user.id = queryDocumentSnapshot.getId();
                             users.add(user);
                         }
-                        if (users.size()>0){
+                        if (users.size() > 0) {
                             UsersAdapter usersAdapter = new UsersAdapter(users, this);
                             binding.usersRecyclerView.setAdapter(usersAdapter);
                             binding.usersRecyclerView.setVisibility(View.VISIBLE);
-                        }else {
+                        } else {
                             showErrorMessage();
                         }
-                    }else {
+                    } else {
                         showErrorMessage();
                     }
                 });
     }
 
-    private void showErrorMessage(){
-        binding.textErrorMessage.setText(String.format("%s","No user available"));
+    /**
+     * Displays an error message when no users are available.
+     */
+    private void showErrorMessage() {
+        binding.textErrorMessage.setText(String.format("%s", "No user available"));
         binding.textErrorMessage.setVisibility(View.VISIBLE);
     }
 
-    private void loading(Boolean isLoading){
-        if(isLoading){
+    /**
+     * Controls the visibility of the progress bar to show or hide loading state.
+     * @param isLoading whether the loading state is active.
+     */
+    private void loading(Boolean isLoading) {
+        if (isLoading) {
             binding.progressBar.setVisibility(View.VISIBLE);
-        }else {
+        } else {
             binding.progressBar.setVisibility(View.INVISIBLE);
         }
     }
@@ -95,7 +109,7 @@ public class userActivity extends AppCompatActivity implements UserListener {
     @Override
     public void onUserClicked(User user) {
         Intent intent = new Intent(getApplicationContext(), ChatActivity.class);
-        intent.putExtra(Constants.KEY_USER,user);
+        intent.putExtra(Constants.KEY_USER, user);
         startActivity(intent);
         finish();
     }
